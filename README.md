@@ -1,114 +1,434 @@
-# Software-Reliability-Incident-Intelligence-System
-An intelligent reliability platform that continuously analyzes application logs, infrastructure metrics, API performance, and system events to detect abnormal behavior, predict potential incidents, identify probable root causes, and provide actionable incident intelligence.
+# SentinelAI — Software Reliability & Incident Intelligence System
 
-'''
+SentinelAI is an AI-powered software reliability platform designed to monitor
+application behavior, analyze system telemetry, detect anomalies, predict
+potential incidents, and assist developers in identifying probable root causes.
+
+The goal is to transform raw software metrics and logs into actionable
+reliability intelligence.
+
+---
+
+## Problem Statement
+
+Modern software systems generate huge volumes of logs, API metrics,
+infrastructure metrics, and operational events.
+
+Identifying failures manually becomes difficult as systems grow.
+
+SentinelAI aims to answer questions such as:
+
+- Is the application behaving abnormally?
+- Which service is experiencing degradation?
+- Is an incident likely to occur soon?
+- What metrics changed before the incident?
+- What is the probable root cause?
+- Has this type of incident happened before?
+- How healthy is the application overall?
+
+---
+
+## Key Features
+
+###  Real-Time Monitoring
+Monitor important application and infrastructure metrics:
+
+- Request throughput
+- API latency
+- P95/P99 latency
+- Error rate
+- CPU usage
+- Memory usage
+- Database latency
+- Service health
+
+###  Anomaly Detection
+
+Machine-learning models learn normal application behavior and detect
+unusual combinations of system metrics.
+
+Planned approaches include:
+
+- Statistical thresholds
+- Z-score / rolling statistics
+- Isolation Forest
+- Multivariate anomaly detection
+
+### Incident Prediction
+
+Analyze recent telemetry windows to estimate the probability of an
+incident occurring in the near future.
+
+Example:
+
+Incident Risk — Next 30 Minutes: HIGH (78%)
+
+### Root Cause Analysis
+
+Correlate anomalies across services and metrics to identify probable
+causes of degradation.
+
+Example:
+
+Affected Service: Search API
+
+Probable Cause:
+Database latency degradation
+
+Supporting Evidence:
+- DB latency +180%
+- API P95 latency +230%
+- Error rate +310%
+- CPU remained normal
+
+### AI Incident Analyst
+
+Convert technical incident evidence into a readable report containing:
+
+- Incident summary
+- Affected services
+- Abnormal metrics
+- Probable root cause
+- Confidence
+- Recommended investigation steps
+
+---
+
+## Architecture
+
+```text
+Application / Microservices
+            │
+            ▼
+     Telemetry Collection
+            │
+     ┌──────┼───────┐
+     ▼      ▼       ▼
+   Logs   Metrics   Events
+     └──────┬───────┘
+            ▼
+      FastAPI Backend
+            │
+            ▼
+        PostgreSQL
+            │
+            ▼
+      Feature Pipeline
+            │
+     ┌──────┼─────────┐
+     ▼      ▼         ▼
+ Anomaly  Incident   Forecasting
+Detection Prediction
+     └──────┬─────────┘
+            ▼
+     Root Cause Engine
+            │
+            ▼
+     AI Incident Analyst
+            │
+            ▼
+       React Dashboard
+```
+
+---
+
+## Tech Stack
+
+### Backend
+
+- Python
+- FastAPI
+- PostgreSQL
+- SQLAlchemy
+- Pydantic
+
+### Data Science
+
+- Pandas
+- NumPy
+- Scikit-learn
+- SciPy
+- Jupyter Notebook
+
+### Machine Learning
+
+- Isolation Forest
+- Classification models
+- Clustering
+- Time-series analysis
+- Feature engineering
+
+### Frontend
+
+- React
+- JavaScript
+- Plotly / Recharts
+
+### DevOps
+
+- Docker
+- GitHub Actions
+
+
+---
+
+## Project Structure
+
+```text
 sentinel-ai/
-├── README.md
-├── LICENSE
-├── .gitignore
-├── .env.example
-├── docker-compose.yml
-├── pyproject.toml                 # or requirements.txt for V1
-├── Makefile                       # optional developer shortcuts
-│
-├── docs/
-│   ├── architecture.md
-│   ├── data_dictionary.md
-│   ├── model_cards/
-│   │   ├── anomaly_model.md
-│   │   └── incident_model.md
-│   └── images/
 │
 ├── backend/
 │   ├── app/
-│   │   ├── main.py
-│   │   ├── core/
-│   │   │   ├── config.py
-│   │   │   ├── logging.py
-│   │   │   └── security.py
 │   │   ├── api/
-│   │   │   ├── routes_health.py
-│   │   │   ├── routes_telemetry.py
-│   │   │   ├── routes_incidents.py
-│   │   │   └── routes_services.py
-│   │   ├── schemas/
-│   │   │   ├── telemetry.py
-│   │   │   ├── incident.py
-│   │   │   └── service.py
+│   │   ├── core/
 │   │   ├── db/
-│   │   │   ├── session.py
-│   │   │   ├── models.py
-│   │   │   └── repositories.py
+│   │   ├── schemas/
 │   │   ├── services/
-│   │   │   ├── ingestion.py
-│   │   │   ├── aggregation.py
-│   │   │   ├── anomaly_service.py
-│   │   │   ├── incident_service.py
-│   │   │   └── root_cause_service.py
 │   │   └── ml/
-│   │       ├── feature_builder.py
-│   │       ├── inference.py
-│   │       └── model_registry.py
 │   └── tests/
-│       ├── test_ingestion.py
-│       ├── test_features.py
-│       └── test_incidents.py
 │
 ├── frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── Overview.jsx
-│   │   │   ├── Services.jsx
-│   │   │   ├── Incidents.jsx
-│   │   │   └── IncidentDetail.jsx
-│   │   ├── components/
-│   │   │   ├── MetricCard.jsx
-│   │   │   ├── HealthScore.jsx
-│   │   │   ├── TimeSeriesChart.jsx
-│   │   │   └── IncidentTable.jsx
-│   │   ├── api/client.js
-│   │   └── App.jsx
-│   └── package.json
+│   └── src/
+│       ├── pages/
+│       ├── components/
+│       └── api/
 │
 ├── data-science/
 │   ├── notebooks/
-│   │   ├── 01_eda.ipynb
-│   │   ├── 02_feature_engineering.ipynb
-│   │   ├── 03_anomaly_detection.ipynb
-│   │   ├── 04_incident_prediction.ipynb
-│   │   └── 05_root_cause_analysis.ipynb
 │   ├── src/
-│   │   ├── load_data.py
-│   │   ├── preprocess.py
-│   │   ├── features.py
-│   │   ├── train_anomaly.py
-│   │   ├── train_incident.py
-│   │   └── evaluate.py
-│   ├── artifacts/                 # gitignored trained models
+│   ├── artifacts/
 │   └── reports/
 │
 ├── simulator/
-│   ├── app.py                     # instrumented demo service
+│   ├── scenarios/
 │   ├── traffic_generator.py
-│   ├── fault_injector.py
-│   └── scenarios/
-│       ├── latency_spike.py
-│       ├── memory_pressure.py
-│       ├── db_slowdown.py
-│       └── error_burst.py
+│   └── fault_injector.py
 │
 ├── sdk/
 │   └── python/
-│       ├── sentinelai/__init__.py
-│       └── sentinelai/client.py
 │
+├── docs/
 ├── scripts/
-│   ├── seed_demo_data.py
-│   ├── train_models.py
-│   └── run_demo.py
-│
-└── .github/
-    └── workflows/
-        ├── backend-tests.yml
-        └── frontend-build.yml
-'''
+├── docker-compose.yml
+├── .env.example
+└── README.md
+```
+
+Detailed internal architecture will be documented inside `/docs`.
+
+---
+
+## Data Science Pipeline
+
+```text
+Raw Telemetry
+      ↓
+Data Cleaning
+      ↓
+Time Alignment
+      ↓
+Feature Engineering
+      ↓
+Exploratory Data Analysis
+      ↓
+Baseline Detection
+      ↓
+Anomaly Detection
+      ↓
+Incident Prediction
+      ↓
+Root Cause Analysis
+      ↓
+Model Evaluation
+      ↓
+Production Inference
+```
+
+Example engineered features:
+
+- Rolling mean latency
+- Rolling standard deviation
+- P95 latency
+- Error-rate change
+- Request-rate change
+- CPU moving average
+- Memory growth rate
+- Database latency change
+- Error/traffic ratio
+- Cross-service correlations
+
+---
+
+## Fault Simulation
+
+SentinelAI includes a simulator for generating controlled reliability
+incidents.
+
+Planned scenarios:
+
+```text
+Normal Traffic
+      ↓
+Latency Spike
+      ↓
+Database Slowdown
+      ↓
+Memory Pressure
+      ↓
+Error Burst
+```
+
+This allows anomaly and incident models to be tested using known
+ground-truth events.
+
+---
+
+## Dashboard
+
+The dashboard will contain:
+
+### Overview
+
+- System health score
+- Requests per minute
+- Error rate
+- Average latency
+- P95 latency
+- CPU utilization
+- Memory utilization
+- Current incident risk
+
+### Services
+
+Health and telemetry for individual services.
+
+### Incidents
+
+Historical and active incidents including:
+
+- Severity
+- Start time
+- Duration
+- Affected service
+- Probable cause
+- Model confidence
+
+### Incident Detail
+
+Timeline showing:
+
+```text
+Traffic
+Latency
+Errors
+CPU
+Memory
+Database latency
+        ↓
+Incident detected
+        ↓
+Probable root cause
+```
+
+---
+
+## API
+
+Example endpoints:
+
+```text
+GET  /health
+
+POST /api/v1/telemetry
+
+GET  /api/v1/services
+GET  /api/v1/services/{service_id}
+
+GET  /api/v1/incidents
+GET  /api/v1/incidents/{incident_id}
+
+GET  /api/v1/anomalies
+GET  /api/v1/system/health
+```
+
+---
+
+## Development Roadmap
+
+### Phase 1 — Foundation
+
+- [ ] Repository setup
+- [ ] FastAPI backend
+- [ ] PostgreSQL database
+- [ ] Telemetry schema
+- [ ] Demo microservice
+
+### Phase 2 — Monitoring
+
+- [ ] Telemetry ingestion
+- [ ] Metric aggregation
+- [ ] Historical metric storage
+- [ ] Basic monitoring dashboard
+
+### Phase 3 — Data Science
+
+- [ ] Exploratory data analysis
+- [ ] Feature engineering
+- [ ] Statistical anomaly baseline
+- [ ] Isolation Forest model
+- [ ] Model evaluation
+
+### Phase 4 — Incident Intelligence
+
+- [ ] Incident dataset generation
+- [ ] Incident prediction model
+- [ ] Severity classification
+- [ ] Incident clustering
+- [ ] Root-cause ranking
+
+### Phase 5 — AI Layer
+
+- [ ] Automated incident summaries
+- [ ] Root-cause explanation
+- [ ] Investigation recommendations
+
+### Phase 6 — Deployment
+
+- [ ] Dockerize services
+- [ ] CI/CD
+- [ ] Authentication
+- [ ] API keys
+- [ ] Cloud deployment
+- [ ] Public demo
+
+---
+
+## Long-Term Vision
+
+Develop SentinelAI into a lightweight developer observability platform
+where users can:
+
+1. Create an account.
+2. Register an application.
+3. Generate an API key.
+4. Connect the SentinelAI SDK.
+5. Stream application telemetry.
+6. Monitor reliability.
+7. Detect anomalies automatically.
+8. Receive intelligent incident reports.
+
+Example future integration:
+
+```python
+from sentinelai import Sentinel
+
+sentinel = Sentinel(api_key="YOUR_API_KEY")
+
+sentinel.track_metric(
+    service="recommendation-api",
+    latency=182,
+    error_rate=0.012
+)
+```
+
+---
